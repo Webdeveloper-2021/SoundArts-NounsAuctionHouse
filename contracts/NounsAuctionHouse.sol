@@ -69,7 +69,6 @@ constract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ow
         address _weth,
         address _ape,
         uint256 _timeBuffer,
-        // uint256 _reservePrice,
         uint256 _reservePriceETH,
         uint256 _reservePriceAPE,
         uint8 _minBidIncrementPercentage,
@@ -82,7 +81,6 @@ constract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ow
         weth = _weth;
         ape = _ape;
         timeBuffer = _timeBuffer;
-        // reservePrice = _reservePrice;
         reservePriceETH = _reservePriceETH;
         reservePriceAPE = _reservePriceAPE;
         minBidIncrementPercentage = _minBidIncrementPercentage;
@@ -113,7 +111,6 @@ constract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ow
 
         require(_auction.nounId == nounId, 'Noun not up for auction');
         require(block.timestamp < _auction.endTime, 'Auction expired');
-        // require(msg.value >= reservePrice, 'Must send at least reservePrice');
         
         if(msg.value < reservePriceETH) {
             require( IERC20(ape).balanceOf(msg.sender) < reservePriceAPE, 
@@ -265,7 +262,7 @@ constract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ow
             if (!_safeTransferETH(owner(), _auction.amount)) {
                 uint256 amountAPE =  _auction.amount * reservePriceAPE / reservePriceETH;
                 _safeTransferAPE(owner(), amountAPE);
-                
+
                 emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, "APE");
             }else{
                 emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, "ETH");
