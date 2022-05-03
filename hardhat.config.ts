@@ -11,17 +11,17 @@ dotenv.config({ path: `${__dirname}/.env` });
 import 'dotenv/config';
 
 
-import "./scripts/deploy"
-import "./scripts/push-metadata-update";
-import "./scripts/verify";
-import "./scripts/send-eth";
-import "./scripts/set-baseuri";
-import "./scripts/gen-whitelist";
-import("./scripts/initialize-sale")
-.catch((err) => {
-  console.log("./scripts/initialize-sale not imported until after build completes")
-});
-import "./scripts/grant-roles";
+// import "./scripts/deploy"
+// import "./scripts/push-metadata-update";
+// import "./scripts/verify";
+// import "./scripts/send-eth";
+// import "./scripts/set-baseuri";
+// import "./scripts/gen-whitelist";
+// import("./scripts/initialize-sale")
+// .catch((err) => {
+//   console.log("./scripts/initialize-sale not imported until after build completes")
+// });
+// import "./scripts/grant-roles";
 
 
 const ALCHEMY_PROJECT_ID = process.env.ALCHEMY_PROJECT_ID || "";
