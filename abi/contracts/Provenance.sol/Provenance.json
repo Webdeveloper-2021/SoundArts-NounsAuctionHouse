@@ -1,6 +1,0 @@
-[
-  "function provenance() view returns (bytes32)",
-  "function revealTimestamp() view returns (uint256)",
-  "function startingIndex() view returns (uint256)",
-  "function startingIndexBlock() view returns (uint256)"
-]

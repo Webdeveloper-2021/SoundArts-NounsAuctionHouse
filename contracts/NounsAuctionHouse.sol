@@ -32,8 +32,8 @@ import { INounsAuctionHouse } from './interfaces/INounsAuctionHouse.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 
-abstract contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ownable {
-    // The Nouns ERC721 token contract
+contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ownable {
+   // The Nouns ERC721 token contract
     IERC721 public nouns;
 
     // The address of the WETH contract
@@ -267,9 +267,11 @@ abstract contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyG
                 uint256 amountAPE =  _auction.amount * reservePriceAPE / reservePriceETH;
                 _safeTransferAPE(owner(), amountAPE);
 
-                emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, "APE");
+                // emit AuctionSettled(_auction.nounId, _auction.bidder, amountAPE, "APE");
+                emit AuctionSettled(_auction.nounId, _auction.bidder, amountAPE, false);
             }else{
-                emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, "ETH");
+                // emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, "ETH");
+                emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, true);
             }
         }
     }

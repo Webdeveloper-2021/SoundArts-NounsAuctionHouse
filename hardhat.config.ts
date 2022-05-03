@@ -5,10 +5,10 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 import "hardhat-abi-exporter";
+
 import { utils, Wallet } from "ethers";
 import * as dotenv from "dotenv";
 dotenv.config({ path: `${__dirname}/.env` });
-import 'dotenv/config';
 
 
 // import "./scripts/deploy"
@@ -43,15 +43,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
-  solidity: {
-    version: "0.8.10",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200,
-      },
-    },
-  },
+  solidity: "0.8.10",
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
   },
@@ -65,8 +57,7 @@ const config: HardhatUserConfig = {
       gasPrice: utils.parseUnits("150", "gwei").toNumber(),
     },
     rinkeby: {
-      // url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_RINKEBY_PROJECT_ID}`,
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_RINKEBY_PROJECT_ID}`,
       accounts: [DEPLOYER_PRIVATE_KEY],
       gasPrice: utils.parseUnits("5", "gwei").toNumber(),
     },
@@ -84,7 +75,7 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: './dist/types',
     target: 'ethers-v5',
-  }
+  },
 };
 
 

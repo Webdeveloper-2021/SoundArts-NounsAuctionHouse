@@ -18,7 +18,7 @@
 pragma solidity ^0.8.6;
 
 interface INounsAuctionHouse {
-    struct Auction {
+     struct Auction {
         // ID for the Noun (ERC721 token ID)
         uint256 nounId;
         // The current highest bid amount
@@ -40,7 +40,8 @@ interface INounsAuctionHouse {
     event AuctionExtended(uint256 indexed nounId, uint256 endTime);
 
     // event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount);
-    event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount, string tokenName);
+    // event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount, string tokenName);
+    event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount, bool isETH);
 
     event AuctionTimeBufferUpdated(uint256 timeBuffer);
 
@@ -64,7 +65,9 @@ interface INounsAuctionHouse {
 
     function setTimeBuffer(uint256 timeBuffer) external;
 
-    function setReservePrice(uint256 reservePrice) external;
+    function setReservePriceETH(uint256 _reservePriceETH) external;
+   
+    function setReservePriceAPE(uint256 _reservePriceAPE) external;
 
     function setMinBidIncrementPercentage(uint8 minBidIncrementPercentage) external;
 }
