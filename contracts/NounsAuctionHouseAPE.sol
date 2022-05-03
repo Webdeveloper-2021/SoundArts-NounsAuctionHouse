@@ -28,18 +28,27 @@ import { Pausable } from '@openzeppelin/contracts/security/Pausable.sol';
 import { ReentrancyGuard } from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 import { IERC20 } from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import { INounsAuctionHouse } from './interfaces/INounsAuctionHouse.sol';
+import { INounsAuctionHouseAPE } from './interfaces/INounsAuctionHouseAPE.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import { IWETH } from './interfaces/IWETH.sol';
 
-contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ownable {
-    // The Nouns ERC721 token contract
+contract NounsAuctionHouseAPE is INounsAuctionHouseAPE, Pausable, ReentrancyGuard, Ownable {
+   // The Nouns ERC721 token contract
     IERC721 public nouns;
+
+    // The address of the WETH contract
+    address public weth;
+    
+    // The address of the ApeCoin(APE) contract
+    address public ape;
 
     // The minimum amount of time left in an auction after a new bid is created
     uint256 public timeBuffer;
 
     // The minimum price accepted in an auction
-    uint256 public reservePrice;
+    // uint256 public reservePrice;
+    uint256 public reservePriceETH;
+    uint256 public reservePriceAPE;
 
     // The minimum percentage difference between the last bid amount and the current bid
     uint8 public minBidIncrementPercentage;
@@ -48,7 +57,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
     uint256 public duration;
 
     // The active auction
-    INounsAuctionHouse.Auction public auction;
+    INounsAuctionHouseAPE.Auction public auction;
 
     /**
      * @notice Initialize the auction house and base contracts,
@@ -57,8 +66,11 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
      */
     constructor(
         address _nouns,
+        address _weth,
+        address _ape,
         uint256 _timeBuffer,
-        uint256 _reservePrice,
+        uint256 _reservePriceETH,
+        uint256 _reservePriceAPE,
         uint8 _minBidIncrementPercentage,
         uint256 _duration
     ) {
@@ -66,9 +78,11 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
         _pause();
 
         nouns = IERC721(_nouns);
-        // weth = _weth;
+        weth = _weth;
+        ape = _ape;
         timeBuffer = _timeBuffer;
-        reservePrice = _reservePrice;
+        reservePriceETH = _reservePriceETH;
+        reservePriceAPE = _reservePriceAPE;
         minBidIncrementPercentage = _minBidIncrementPercentage;
         duration = _duration;
     }
@@ -93,11 +107,17 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
      * @dev This contract only accepts payment in ETH.
      */
     function createBid(uint256 nounId) external payable override nonReentrant {
-        INounsAuctionHouse.Auction memory _auction = auction;
+        INounsAuctionHouseAPE.Auction memory _auction = auction;
 
         require(_auction.nounId == nounId, 'Noun not up for auction');
         require(block.timestamp < _auction.endTime, 'Auction expired');
-        require(msg.value >= reservePrice, 'Must send at least reservePrice');
+        
+        if(msg.value < reservePriceETH) {
+            require( IERC20(ape).balanceOf(msg.sender) < reservePriceAPE, 
+                    'Must send at least reservePriceETH or reservePriceAPE');
+        }
+
+
         require(
             msg.value >= _auction.amount + ((_auction.amount * minBidIncrementPercentage) / 100),
             'Must send more than last bid by minBidIncrementPercentage amount'
@@ -107,7 +127,11 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
 
         // Refund the last bidder, if applicable
         if (lastBidder != address(0)) {
-            _safeTransferETH(lastBidder, _auction.amount);
+            // _safeTransferETHWithFallback(lastBidder, _auction.amount);
+            if (!_safeTransferETH(lastBidder, _auction.amount)) {
+                uint256 amountAPE =  _auction.amount * reservePriceAPE / reservePriceETH;
+                _safeTransferAPE(lastBidder, amountAPE);
+            }
         }
 
         auction.amount = msg.value;
@@ -168,10 +192,16 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
      * @notice Set the auction reserve price.
      * @dev Only callable by the owner.
      */
-    function setReservePrice(uint256 _reservePrice) external override onlyOwner {
-        reservePrice = _reservePrice;
+    function setReservePriceETH(uint256 _reservePriceETH) external onlyOwner {
+        reservePriceETH = _reservePriceETH;
 
-        emit AuctionReservePriceUpdated(_reservePrice);
+        emit AuctionReservePriceETHUpdated(_reservePriceETH);
+    }
+   
+    function setReservePriceAPE(uint256 _reservePriceAPE) external onlyOwner {
+        reservePriceAPE = _reservePriceAPE;
+
+        emit AuctionReservePriceAPEUpdated(_reservePriceAPE);
     }
 
     /**
@@ -218,7 +248,7 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
      * @dev If there are no bids, the Noun is burned.
      */
     function _settleAuction() internal {
-        INounsAuctionHouse.Auction memory _auction = auction;
+        INounsAuctionHouseAPE.Auction memory _auction = auction;
 
         require(_auction.startTime != 0, "Auction hasn't begun");
         require(!_auction.settled, 'Auction has already been settled');
@@ -233,10 +263,27 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
         }
 
         if (_auction.amount > 0) {
-            _safeTransferETH(owner(), _auction.amount);
-        }
+            if (!_safeTransferETH(owner(), _auction.amount)) {
+                uint256 amountAPE =  _auction.amount * reservePriceAPE / reservePriceETH;
+                _safeTransferAPE(owner(), amountAPE);
 
-        emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount);
+                // emit AuctionSettled(_auction.nounId, _auction.bidder, amountAPE, "APE");
+                emit AuctionSettled(_auction.nounId, _auction.bidder, amountAPE, false);
+            }else{
+                // emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, "ETH");
+                emit AuctionSettled(_auction.nounId, _auction.bidder, _auction.amount, true);
+            }
+        }
+    }
+
+    /**
+     * @notice Transfer ETH. If the ETH transfer fails, wrap the ETH and try send it as WETH.
+     */
+    function _safeTransferETHWithFallback(address to, uint256 amount) internal {
+        if (!_safeTransferETH(to, amount)) {
+            IWETH(weth).deposit{ value: amount }();
+            IERC20(weth).transfer(to, amount);            
+        }
     }
 
     /**
@@ -247,4 +294,12 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
         (bool success, ) = to.call{ value: value, gas: 30_000 }(new bytes(0));
         return success;
     }
+
+    /**
+     * @notice Transfer APE and return the success status.
+     */
+    function _safeTransferAPE(address to, uint256 amount) internal returns (bool) {
+        bool success = IERC20(ape).transfer(to, amount);
+        return success;
+    }    
 }

@@ -18,6 +18,7 @@ const config = {
     auctionAddress: "0x2D525EdF24588bAF9389Bebcd59B81674103aADd",
     timeBuffer: 600,
     reservePriceETH: utils.parseEther("2"),
+    reservePriceAPE: utils.parseEther("3000"),
     minBidIncrementPercentage: 5,
     duration: 86400,
     wethAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", 
@@ -34,12 +35,15 @@ async function main() {
 
   // We get the contract to deploy
   console.log("deploy start ====")
-//   console.log("config ====", config)
+  console.log("config ====", config)
   const NounsAuctionHouse = await hre.ethers.getContractFactory("NounsAuctionHouse");
   const contract = await NounsAuctionHouse.deploy(
     config.tokenAddress,
+    config.wethAddress,
+    config.apeAddress,
     config.timeBuffer,
     config.reservePriceETH,
+    config.reservePriceAPE,
     config.minBidIncrementPercentage,
     86400
   );
