@@ -39,13 +39,10 @@ interface INounsAuctionHouse {
 
     event AuctionExtended(uint256 indexed nounId, uint256 endTime);
 
-    // event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount);
     // event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount, string tokenName);
     event AuctionSettled(uint256 indexed nounId, address winner, uint256 amount, bool isETH);
 
     event AuctionTimeBufferUpdated(uint256 timeBuffer);
-
-    // event AuctionReservePriceUpdated(uint256 reservePrice);
 
     event AuctionReservePriceETHUpdated(uint256 reservePriceETH);
     
