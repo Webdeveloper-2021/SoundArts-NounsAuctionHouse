@@ -127,7 +127,11 @@ abstract contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyG
 
         // Refund the last bidder, if applicable
         if (lastBidder != address(0)) {
-            _safeTransferETHWithFallback(lastBidder, _auction.amount);
+            // _safeTransferETHWithFallback(lastBidder, _auction.amount);
+            if (!_safeTransferETH(lastBidder, _auction.amount)) {
+                uint256 amountAPE =  _auction.amount * reservePriceAPE / reservePriceETH;
+                _safeTransferAPE(lastBidder, amountAPE);
+            }
         }
 
         auction.amount = msg.value;
