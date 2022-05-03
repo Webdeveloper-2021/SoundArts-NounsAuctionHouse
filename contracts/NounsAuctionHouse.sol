@@ -32,7 +32,7 @@ import { INounsAuctionHouse } from './interfaces/INounsAuctionHouse.sol';
 import { IERC721 } from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import { IWETH } from './interfaces/IWETH.sol';
 
-constract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ownable {
+contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Ownable {
     // The Nouns ERC721 token contract
     IERC721 public nouns;
 
