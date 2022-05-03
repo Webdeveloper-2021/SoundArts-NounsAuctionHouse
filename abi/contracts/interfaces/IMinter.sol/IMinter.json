@@ -1,0 +1,6 @@
+[
+  "function ADMIN_ROLE() returns (bytes32)",
+  "function grantRole(bytes32,address)",
+  "function initialize(address,address[],uint256[])",
+  "function mint(uint256) payable"
+]

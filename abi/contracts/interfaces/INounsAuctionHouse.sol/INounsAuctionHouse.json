@@ -1,0 +1,17 @@
+[
+  "event AuctionBid(uint256 indexed,address,uint256,bool)",
+  "event AuctionCreated(uint256 indexed,uint256,uint256)",
+  "event AuctionExtended(uint256 indexed,uint256)",
+  "event AuctionMinBidIncrementPercentageUpdated(uint256)",
+  "event AuctionReservePriceUpdated(uint256)",
+  "event AuctionSettled(uint256 indexed,address,uint256)",
+  "event AuctionTimeBufferUpdated(uint256)",
+  "function createBid(uint256) payable",
+  "function pause()",
+  "function setMinBidIncrementPercentage(uint8)",
+  "function setReservePrice(uint256)",
+  "function setTimeBuffer(uint256)",
+  "function settleAuction()",
+  "function settleCurrentAndCreateNewAuction()",
+  "function unpause()"
+]

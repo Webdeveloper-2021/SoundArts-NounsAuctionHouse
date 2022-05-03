@@ -1,0 +1,11 @@
+[
+  "function DEFAULT_ADMIN_ROLE() returns (bytes32)",
+  "function MINTER_ROLE() returns (bytes32)",
+  "function grantRole(bytes32,address)",
+  "function initialize(string,string)",
+  "function maxSupply() returns (uint256)",
+  "function mint(address)",
+  "function setBaseURI(string)",
+  "function setTokenURI(uint256,string)",
+  "function totalMinted() returns (uint256)"
+]
