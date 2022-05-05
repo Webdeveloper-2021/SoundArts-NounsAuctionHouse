@@ -151,6 +151,8 @@ contract NounsAuctionHouse is INounsAuctionHouse, Pausable, ReentrancyGuard, Own
 
         if (auction.startTime == 0 || auction.settled) {
             _createAuction(id);
+        } else {
+            require(false, "Auction already in progress");
         }
     }
 
