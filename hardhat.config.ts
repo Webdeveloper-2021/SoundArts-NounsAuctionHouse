@@ -61,6 +61,11 @@ const config: HardhatUserConfig = {
       accounts: [DEPLOYER_PRIVATE_KEY],
       gasPrice: utils.parseUnits("5", "gwei").toNumber(),
     },
+    ropsten: {
+      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_RINKEBY_PROJECT_ID}`,
+      accounts: [DEPLOYER_PRIVATE_KEY],
+      gasPrice: utils.parseUnits("5", "gwei").toNumber(),
+    },
     goerli: {
       url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_PROJECT_ID}`,
       accounts: [DEPLOYER_PRIVATE_KEY],

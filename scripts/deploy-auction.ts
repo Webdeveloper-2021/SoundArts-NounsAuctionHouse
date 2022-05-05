@@ -7,21 +7,12 @@ const hre = require("hardhat");
 // import { util } from "chai";
 import { utils } from "ethers";
 const config = {
-    name: "WE_ARE_KLOUD",
-    symbol: "KLOUD",
-    baseUri: "",
-    maxSupply: 5000,
-    price: utils.parseEther("0.125"),
     // tokenAddress: "0xB8Da418FFC2Cb675B8B3d73dca0E3f10811FBbdD",
     tokenAddress: "0x6f1247Ea33A5C674A53e7710b246764e0D5b9Cb8",     // rinkeby erc721a
-    minterAddress: "0x5233cd008943C1bFe70a353867432Bf56e9b57A2",
-    auctionAddress: "0x2D525EdF24588bAF9389Bebcd59B81674103aADd",
     timeBuffer: 600,
     reservePriceETH: utils.parseEther("2"),
     minBidIncrementPercentage: 5,
-    duration: 86400,
-    wethAddress: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", 
-    apeAddress: "0x4d224452801ACEd8B2F0aebE155379bb5D594381"
+    duration: 86400  
 }
 
 async function main() {
@@ -41,7 +32,7 @@ async function main() {
     config.timeBuffer,
     config.reservePriceETH,
     config.minBidIncrementPercentage,
-    86400
+    config.duration
   );
 
   await contract.deployed();
